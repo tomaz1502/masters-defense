@@ -84,6 +84,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \usepackage{pifont}
 
 \newcommand{\bluecheck}{{\color{blue}\checkmark}}
+\newcommand{\greencheck}{{\color{blue}\checkmark}}
 \newcommand{\redmark}{\color{red}{\ding{55}}}
 
 \newcommand\vvthinspace{\kern+0.041667em}
@@ -524,31 +525,21 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \end{frame}
 
 \begin{frame}
-  \frametitle{History: Computers and Proofs}
-  \begin{itemize}
-    \item The usual technique to prove such a fact is to find an \textit{unavoidable set} and prove that each of its elements is \textit{reducible}
-    \vitem For this conjecture, the minimal unavoidable set found had 1834 elements, which was too hard to be checked
-    \vitem Mathematicians realized that they could write computer programs to check the reducibility of each graph, instead of doing it manually
-    \vitem In 1989, Appel and Hekken proved the theorem using this approach, which created a debate on whether or not this kind of proof is acceptable
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
   \frametitle{Automatic and Interactive Theorem Provers}
 
   \begin{itemize}
     \item Nowadays we have more sophisticated tools that promote the cooperation between humans and computers to prove theorems
+    \vitem Interactive Theorem Provers (ITPs)
+    \begin{itemize}
+      \item Proof production guided by the user
+      \item Formalization of mathematics
+      \item Twelf, Coq, Isabelle, \textbf{Lean}
+    \end{itemize}
     \vitem Automatic Theorem Provers (ATPs)
     \begin{itemize}
       \item Define a conjecture and press a button to check its validity
       \item Backend of many systems for verification of software
       \item SMT Solvers (z3, \textbf{cvc5})
-    \end{itemize}
-    \vitem Interactive Theorem Provers (ITPs)
-    \begin{itemize}
-      \item Proof production guided by the user
-      \item Formalization of mathematics
-      \item Twelf, Coq, \textbf{Lean}
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -572,23 +563,10 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \begin{itemize}
     \item Cooperation between ATPs and ITPs via proof certificates
     \vitem Hammers: using ATPs to prove theorems stated in the ITP
-    \vitem SMTCoq, Sledgehammer
+    \vitem SMTCoq, Sledgehammer (smt tactic)
     \vitem Lean?
   \end{itemize}
 \end{frame}
-
-% \begin{frame}
-%   \frametitle{Implementing Hammers}
-%   \begin{itemize}
-%     \item Translation Module
-%     \vitem Premise Selection Module
-%     \vitem Proof Reconstruction Module
-%     \begin{itemize}
-%       \item{Certified vs Certifying}
-%     \end{itemize}
-%   \end{itemize}
-% \end{frame}
-
 
 \begin{frame}
   \frametitle{Implementing Hammers}
@@ -603,15 +581,15 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     \end{itemize}
   \end{minipage}
   \begin{minipage}{0.44 \textwidth}
-    \centering
-    \includegraphics[height=0.65\textheight]{images/pic5.png}
+    % \centering
+    % \includegraphics[height=0.65\textheight]{images/pic5.png}
   \end{minipage}
 \end{frame}
 
 \begin{frame}
   \frametitle{Implementing Hammers}
   \centering
-  \includegraphics[height=0.3\textheight]{images/pic4.png}
+  \includegraphics[height=0.26\textheight]{images/pic7.png}
 \end{frame}
 
 \begin{frame}
@@ -631,6 +609,20 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
         \item If the theorem was printed wrongly, the proof would probably be incorrect
     \end{itemize}
   \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Outline}
+  \begin{enumerate}
+    \item Introduction \bluecheck
+    \vitem SMT solvers and proof certificates
+    \vitem Lean
+    \vitem Proof scripts
+    \vitem Certified approach
+    \vitem Certifying approach
+  \end{enumerate}
 \end{frame}
 
 \section{SMT Solvers}
@@ -728,7 +720,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     \begin{itemize}
       \item Theory specific solvers only deal with conjunctions of propositions
     \end{itemize}
-    \vitem Most of them accept the SMT-Lib format as input
+    \vitem Most of them accept the SMT-LIB format as input
   \end{itemize}
 \end{frame}
 
@@ -774,7 +766,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \begin{frame}
   \frametitle{Proof Certificates for Boolean Formulas}
     \begin{itemize}
-    \item Assume that the input formula is in Conjunctive Normal Form (i.e. a conjunction of clauses)
+    \item Initially, assume that the input formula is in Conjunctive Normal Form (i.e. a conjunction of clauses)
     \vitem Resolution Rule
     \begin{itemize}
       \item Let $x$ be a variable and $C_{1}$ and $C_{2}$ be two clauses. If $x$ appears in $C_{1}$ and $\neg x$ appears in $C_{2}$, then from $C_{1} \wedge C_{2}$ we can conclude $C_{1}' \vee C_{2}'$, where $C_{1}'$ is $C_{1}$ without $x$ and $C_{2}'$ is $C_{2}$ without $\neg x$
@@ -852,7 +844,6 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     \item Function applications respect the congruence property:
     \begin{itemize}
       \item If $f$ and $g$ are two functions and $x$ and $y$ are two variables, $f \simeq g$ and $x \simeq y$ imply $f(x) \simeq g(y)$
-      \item Extensionality
     \end{itemize}
     \vitem Proof certificates for unsatisfiability of formulas in this theory consist of proof trees in which the transitions are applications of congruence, reflexivity, symmetry and transitivity
   \end{itemize}
@@ -898,7 +889,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \frametitle{Proof Certificates for Linear Arithmetic}
   \begin{itemize}
     \item Since the Farkas' lemma guarantee that such coefficients always exist, the SMT solver can compute them and provide it as a proof certificate.
-    \vitem Linear Integer Arithmetic? Tight Bounds?
+    % \vitem Linear Integer Arithmetic? Tight Bounds?
   \end{itemize}
 \end{frame}
 
@@ -907,18 +898,18 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \begin{frame}
   \frametitle{Lean}
   \begin{itemize}
-    \item Lean is both a programming language and a proof assistant
-    \vitem Its features include
+    \item Lean is both a functional programming language and a proof assistant
+    \vitem Its features include algebraic datatypes, pattern matching, polymorphism, typeclasses, side effect support with monads and a robust macro system
     % \begin{itemize}
     %   \item It implements the correspondence between propositions and types
     %   \item The proof checker and the type checker are the same piece of code, a kernel with less than 7500 lines
     % \end{itemize}
-    \vitem Mathlib
+    \vitem Growing community, Mathlib
   \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Lean}
+  \frametitle{Lean as a Programming Language}
   \begin{minted}{lean}
     inductive Natural where
       | zero : Natural
@@ -935,17 +926,33 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \end{minted}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Lean as an Interactive Theorem Prover}
+  \begin{itemize}
+    \item Proofs are defined in the same way as functions and can refer to any value defined by the user
+    \begin{itemize}
+      \item Correspondence between types and propositions
+    \end{itemize}
+    \vitem Interaction with the compiler
+    \begin{itemize}
+      \item Consulting the current goal and set of hypothesis
+      \item Checking if each step was valid
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]
-  \frametitle{Lean}
+  \frametitle{Lean as an Interactive Theorem Prover}
   \begin{minted}[fontsize=\footnotesize]{lean}
   theorem add_zero : ∀ (n : Natural), (n + zero) = n :=
     fun n =>
       match n with
       | zero    => rfl
       | succ n' => congrArg succ (add_zero n')
+      -- add_zero n' is a proof for n' + zero = n'
+      -- congrArg succ is a proof for x = y -> succ x = succ y
 
-  theorem add_succ : ∀ (n m : Natural),
-      (n + succ m) = succ (n + m) := fun n m =>
+  theorem add_succ : ∀ (n m : Natural), (n + succ m) = succ (n + m) := fun n m =>
     match n with
     | zero    => rfl
     | succ n' => congrArg succ (add_succ n' m)
@@ -958,9 +965,388 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \end{minted}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Lean as an Interactive Theorem Prover}
+  \begin{itemize}
+    \item Since we have to specify each detail, even proofs for very simple theorems become hard to read and write
+    \vitem Many modern ITPs offer an alternative way for building proofs: tactics
+    \vitem They are routines capable of safely applying transformations on the goal on the fly
+    \vitem They can contain arbitrary pieces of code
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lean as an Interactive Theorem Prover}
+  \begin{minted}{lean}
+  theorem add_comm' : ∀ (n m : Natural), (n + m) = (m + n) := by
+    intros n m
+    induction n with
+    | zero       => rw [add, add_zero]
+    | succ n' IH => rw [add, add_succ, IH]
+  \end{minted}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Implementing Tactics in Lean}
+  \begin{itemize}
+    \item Lean has a rich framework for implementing your own tactics based on \textit{metaprogramming}
+    \begin{itemize}
+      \item The hammer is implemented as a tactic
+    \end{itemize}
+    \vitem They inspect the goal and the set of hypothesis via the internal representation used by Lean's compiler, the \texttt{Expr} type
+    \begin{itemize}
+      \item \texttt{inferType}, \texttt{evalTactic}
+    \end{itemize}
+    \vitem Based on this, they will usually generate a proof that will then be checked by the kernel
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementing Tactics in Lean}
+  \begin{minted}{lean}
+  inductive Expr where
+  | bvar    : Nat -> Expr
+  | fvar    : FVarId -> Expr
+  | mvar    : MVarId -> Expr
+  | const   : Name -> Expr
+  | app     : Expr -> Expr -> Expr
+  | lam     : Name -> Expr -> Expr -> Expr
+  | forallE : Name -> Expr -> Expr -> Expr
+  \end{minted}
+
+\end{frame}
+
+% \begin{frame}
+%   \frametitle{Classical vs Intuitionistic}
+%   \begin{itemize}
+%     \item Lean's logical framework is intuitionistic
+%     \begin{itemize}
+%       \item Only constructive proofs are allowed, it is impossible to prove the law of excluded middle
+%     \end{itemize}
+%     \vitem SMT solvers' logical framework is classical
+%     \begin{itemize}
+%       \item We will translate Lean theorems to the unsatisfiability of SMT problems through elimination of double negation, which is not provable constructively
+%     \end{itemize}
+%     \vitem Solution: introduction of axioms
+%     \begin{itemize}
+%       \item Lean's \texttt{Classical} module
+%     \end{itemize}
+%   \end{itemize}
+% \end{frame}
+
+\section{Proof Certificates in Lean}
+
+\begin{frame}
+  \frametitle{Proof Certificates in Lean}
+  \begin{itemize}
+    \item cvc5 has a module for exporting proof certificates as scripts in Lean
+    \vitem The logical rules used by cvc5 are encoded as axioms in these scripts, so Lean only check whether the rules were applied correctly
+    \vitem The theorems are stated in Lean using a custom type (\texttt{term}) that represents MSFOL formulas, instead of native Lean terms
+    \begin{itemize}
+      \item Its easier to manipulate a \texttt{term} than a proposition
+    \end{itemize}
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Proof Certificates in Lean}
+  \begin{itemize}
+    \item Example: Modus Ponens ($\neg (p \rightarrow (p \rightarrow q) \rightarrow q)$)
+  \end{itemize}
+  \vfill
+  \begin{minted}{smtlib.py -x}
+    (set-logic QF_UF)
+    (declare-const p Bool)
+    (declare-const q Bool)
+    (assert (not (=> p (=> (=> p q) q))))
+  \end{minted}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Proof Certificates in Lean}
+  \centering
+  \includegraphics[height=0.8\textheight]{images/mp_cvc5_proof.png}
+  % \[
+    % \infer[]{\bot}{\infer[]{q}{\infer[]{\neg p \vee q}{\infer[]{p \rightarrow q}{\infer[]{\neg ((p \rightarrow q) \rightarrow q)}{\neg (p \rightarrow (p \rightarrow q) \rightarrow q)}}} & \infer[]{p}{\neg (p \rightarrow (p \rightarrow q) \rightarrow q)}} & \infer[]{\neg q}{\infer[]{\neg ((p \rightarrow q) \rightarrow q)}{\neg (p \rightarrow (p \rightarrow q) \rightarrow q)}}}
+  % \]
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Proof Certificates in Lean}
+  \begin{minted}{lean}
+  inductive term where
+  | const   : Nat -> sort -> term
+  | implies : term -> term -> term
+  | not     : term -> term
+  | top     : term
+  | bot     : term
+  -- ...
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Proof Certificates in Lean}
+  \begin{minted}{lean}
+  def p: term := const 1000 boolSort
+  def q: term := const 1001 boolSort
+
+  def modusPonens: term := implies p (implies (implies p q) q)
+  def notModusPonens: term := not modusPonens
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Proof Certificates in Lean}
+  \begin{minted}{lean}
+  axiom thHolds : term -> Prop
+
+  axiom notImplies1 : ∀ {t1 t2 : term},
+    thHolds (not (implies t1 t2)) -> thHolds t1
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Proof Certificates in Lean}
+  \begin{minted}{lean}
+  theorem cvc5_th0 : thHolds notModusPonens -> thHolds bot :=
+    fun lean_a0 =>
+      have lean_s0 := notImplies2 lean_a0
+      have lean_s1 := notImplies1 lean_s0
+      have lean_s2 := impliesElim lean_s1
+      have lean_s4 := notImplies1 lean_a0
+      have lean_s6 := R1 (conjunction lean_s2 lean_s4)
+      have lean_s9 := notImplies2 lean_s0
+      contradiction (conjunction lean_s9 lean_s6)
+  \end{minted}
+\end{frame}
+
 \section{Certified Transformations}
 
+\begin{frame}
+  \frametitle{Certified Transformations}
+  \begin{itemize}
+    \item We want to make these rules verifiable by Lean's kernel
+    \vitem The first way we will show is to turn them into \textit{theorems} and prove that they are ``correct''
+    \begin{itemize}
+      \item This is known as the certified approach
+      \item Each rule is viewed as a certified function that maps ``valid'' terms into ``valid'' terms
+    \end{itemize}
+    \vitem We will map \texttt{term}s into \texttt{Prop}s. Then, we will be able to prove that a \texttt{term} is correct by proving the corresponding \texttt{Prop}
+    \vitem Initially we will assume that the \texttt{term} always represents a Boolean value
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Certified Transformations}
+  \begin{minted}{lean}
+  def Interpretation: Type := Nat -> Prop
+
+  def evalTerm (I : Interpretation) (t : term) : Prop :=
+    match t with
+    | term.const   i  _  => I i
+    | term.not     t1    => Not (evalTerm I t1)
+    | term.or      t1 t2 => Or (evalTerm I t1) (evalTerm I t2)
+    | term.implies t1 t2 => (evalTerm I t1) -> (evalTerm I t2)
+    | term.bot           => False
+    | term.top           => True
+    | _                  => False
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Certified Transformations}
+  \begin{itemize}
+    \item Now we can define what it means for a given interpretation ``satisfy'' a \texttt{term} and what it means to be ``unsatisfiable'':
+  \end{itemize}
+  \vfill
+  \begin{minted}{lean}
+  def satisfies (I : Interpretation) (t : term) : Prop :=
+    evalTerm I t = True
+
+  def unsatisfiable (t : term) : Prop :=
+    ∀ (I : Interpretation), Not (satisfies I t)
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Certified Transformations}
+  \begin{itemize}
+    \item We can give meaning to the rules in terms of Lean's logic with the predicate \texttt{impliesIn}:
+  \end{itemize}
+  \vfill
+  \begin{minted}{lean}
+  def impliesIn (t1 t2 : term) : Prop :=
+    ∀ (I : Interpretation),
+      satisfies I t1 -> satisfies I t2
+
+  theorem notImplies1 : ∀ {t1 t2 : term},
+      impliesIn (not (implies t1 t2)) t1
+  \end{minted}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Certified Transformations}
+  \begin{itemize}
+    \item The theorem we proved before can now be rephrased as:\\ \texttt{impliesIn notModusPonens bot}
+    \vitem Since \texttt{evalTerm I bot} is \texttt{False} for any interpretation \texttt{I}, we can use this to derive:\\ \mintinline{lean}{∀ (I : Interpretation), evalTerm I notModusPonens = False}
+    \vitem Finally, this can be used to prove the corresponding theorem stated in Lean's native terms:\\
+    \mintinline{lean}{∀ (P Q : Prop), P -> (P -> Q) -> Q}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Certified Transformations}
+  \begin{itemize}
+    \item In order to support more theories, we have to extend our function \texttt{evalTerm} to be able to return values of different types depending on its argument
+    \vitem In a language with dependent types, we can achieve this with a \textit{sigma type}
+    \vitem If \texttt{T} is a type and \texttt{U} is a type constructor that takes as parameter a value of type \texttt{T}, then \texttt{Sigma T U} is the type of pairs \texttt{⟨t, u⟩} such that \texttt{t} has type \texttt{T} and \texttt{u} has type \texttt{U t}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Certified Transformations}
+  \begin{minted}{lean}
+  def evalSort : sort → Type := fun s =>
+    match s with
+    | arrow s1 s2 => evalSort s1 -> evalSort s2
+    | boolSort => Prop
+    | intSort => Int
+    | _ => Prop
+
+  def Interpretation := Nat → @Sigma sort evalSort
+  \end{minted}
+\end{frame}
+\begin{frame}[fragile]
+  \frametitle{Certified Transformations}
+  \begin{minted}{lean}
+  def evalTerm (I : Interpretation) (t : term) :
+      Option (@Sigma sort interpSort) :=
+    match t with
+    | term.const   i  s  => I i
+    | term.and     t1 t2 =>
+      match evalTerm I t1, evalTerm I t2 with
+      | some ⟨ boolSort, p1 ⟩, some ⟨ boolSort , p2 ⟩ =>
+          some ⟨ boolSort, And p1 p2 ⟩
+      | _,_ => none
+    | _ => none
+    \end{minted}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Downsides of Certified Transformations}
+  \begin{itemize}
+    \item For some rules, it seems too hard to give an explicit proof for the general case
+    \begin{itemize}
+      \item Resolution
+      \item Factor
+      \item PermutateClause
+    \end{itemize}
+    \vitem This approach focuses on \textit{normalizing} terms and Lean is not optimized for that
+    \begin{itemize}
+      \item For some rules, we have to provide a \textit{proof by reflection} of the well-typedness of the input term
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
 \section{Certifying Transformations}
+
+\begin{frame}
+  \frametitle{Certifying Transformations}
+  \begin{itemize}
+    \item The certifying transformations approach is a well known alternative for these problems
+    \vitem The idea is to map the rules into functions that will generate proofs on the fly. The correctness of these proofs will have to be checked every time one of these functions is used
+    \vitem In our case, we will map the rules into tactics. However, we still map simpler rules to theorems
+    \vitem We no longer need the \texttt{term} type, as tactics are allowed to inspect the abstract syntax tree of any expression, granting them flexibility
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Certifying Transformations}
+  \begin{itemize}
+    \item We have implemented tactics and theorems to cover all rules for the Boolean, EUF, LRA and LIA fragments
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Certifying Transformations}
+  \begin{minted}{lean}
+  theorem cvc5_th0 {P Q : Prop} : (Not (P → ((P → Q) → Q))) → False :=
+    fun lean_a0 : (Not (P → ((P → Q) → Q))) => by
+      have lean_s0 : (Not ((P → Q) → Q)) := notImplies2 lean_a0
+      have lean_s1 : (P → Q)             := notImplies1 lean_s0
+      have lean_s2 : (Or (Not P) Q)      := impliesElim lean_s1
+      have lean_s3 : P                   := notImplies1 lean_a0
+      have lean_s4 : Q                   := by
+        R2 lean_s2, lean_s3, P, [1, 0]
+      have lean_s5 : (Not ((P → Q) → Q)) := notImplies2 lean_a0
+      have lean_s6 : (Not Q)             := notImplies2 lean_s5
+      exact (show False from contradiction lean_s4 lean_s6)
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{PermutateClause Tactic}
+  \begin{itemize}
+    \item While solving SAT problems, SAT solvers can permutate the order of the terms in a clause. This operation must be justified in proof certificates.
+    \vitem This tactic takes as input a permutation and a proof of a clause and outputs a proof for the same clause, with the terms reordered according to the permutation
+  \end{itemize}
+  \vfill
+  \begin{minted}[fontsize=\footnotesize]{lean}
+  theorem permutateApp (A B C D E : Prop) : A ∨ B ∨ C ∨ D ∨ E -> E ∨ D ∨ B ∨ C ∨ A :=
+    fun h => by permutateClause h, [4, 3, 1, 2, 0]
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{PermutateClause Tactic}
+  \begin{minted}{lean}
+  def pullProps (props : List Expr) (acc : Expr) (s : Nat) :
+      MetaM Expr :=
+    match props with
+      | [] => return acc
+      | e::es => do
+          let pulled ← pullCore e acc s
+          pullProps es pulled s
+
+  def permutateClauseCore (pf : Expr) (perm : List Nat)
+      (s : Nat) : MetaM Expr := do
+    let clause : Expr     ← inferType pf
+    let props : List Expr ← collectPropsInClause' clause s
+    let permutatedProps   := permutateList props (List.reverse perm)
+    pullProps permutatedProps pf s
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Resolution and Factor Tactics}
+  \begin{minted}{lean}
+  theorem resolutionApp (A B C D : Prop) :
+      A ∨ B ∨ C -> D ∨ ¬ B -> A ∨ C ∨ D := by
+    intros h₁ h₂
+    R1 h₁, h₂, B
+
+  theorem factorApp (A B C : Prop) :
+      A ∨ B ∨ A ∨ A ∨ B ∨ C ∨ B → A ∨ B ∨ C := by
+    intro h
+    factor h
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{SumBounds Tactic}
+  \begin{minted}{lean}
+  theorem sumBoundsApp (a c : Nat) (b d : Int) (e f : Rat) :
+      a < d -> b ≤ e -> c ≤ f -> a + (b + c) < d + (e + f) := by
+    intros h₁ h₂ h₃
+    sumBounds [h₁, h₂, h₃]
+  \end{minted}
+\end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{Congruence}
+% \end{frame}
+
 
 \section{Demo: Proof Checking}
 
