@@ -515,10 +515,9 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \begin{frame}
   \frametitle{History: Computers and Proofs}
   \begin{itemize}
-    \item \emph{Four color theorem}: the first major cooperation between humans and computers to prove a theorem
-    \vitem Given a map, what is the minimum number of colors necessary to paint each region in a way that no two adjacent regions share the same color?
-    \vitem This is equivalent to coloring vertices in \textit{planar} graphs
+    \item Given a map, what is the minimum number of colors necessary to paint each region in a way that no two adjacent regions share the same color?
     \vitem Conjecture: it is always possible to find such a coloring with at most 4 colors
+    \vitem \emph{Four color theorem}: the first major cooperation between humans and computers to prove a theorem
   \end{itemize}
   \centering
   \includegraphics[scale=0.7]{images/fourColor.jpg}
@@ -529,7 +528,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 
   \begin{itemize}
     \item Nowadays we have more sophisticated tools that promote the cooperation between humans and computers to prove theorems
-    \vitem Interactive Theorem Provers (ITPs)
+    \vitem Interactive Theorem Provers (ITPs) (or proof assistants)
     \begin{itemize}
       \item Proof production guided by the user
       \item Formalization of mathematics
@@ -550,9 +549,9 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \begin{tabular}{|c|c|c|}
   \hline
               & \textbf{Lean}                                & \textbf{cvc5}                          \\ \hline
-  Expressivity & Calculus of Inductive Constructions & Many-Sorted First Order Logic \\
   Trusted Base & Small kernel                        & Complete software             \\
-  Usage        & Build proofs step by step           & Fully automatic               \\ \hline
+  Usage        & Build proofs step by step           & Fully automatic               \\
+  Expressivity & Calculus of Inductive Constructions & First Order Logic \\ \hline
   \end{tabular}
   \end{table}
 \end{frame}
@@ -581,16 +580,16 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     \end{itemize}
   \end{minipage}
   \begin{minipage}{0.44 \textwidth}
-    % \centering
-    % \includegraphics[height=0.65\textheight]{images/pic5.png}
+    \centering
+    \includegraphics[height=0.65\textheight]{images/pic5.png}
   \end{minipage}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Implementing Hammers}
-  \centering
-  \includegraphics[height=0.26\textheight]{images/pic7.png}
-\end{frame}
+% \begin{frame}
+%   \frametitle{Implementing Hammers}
+%   \centering
+%   \includegraphics[height=0.26\textheight]{images/pic7.png}
+% \end{frame}
 
 \begin{frame}
   \frametitle{Another Application}
@@ -599,14 +598,10 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     \begin{itemize}
       \item Carcara
     \end{itemize}
-    \vitem Is the ITP reliable?
+    \vitem The ITP is more reliable than an independent checker
     \begin{itemize}
       \item Small kernel
       \item Many users constantly testing it
-    \end{itemize}
-    \vitem Is the certificate indeed proving the original theorem?
-    \begin{itemize}
-        \item If the theorem was printed wrongly, the proof would probably be incorrect
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -619,7 +614,6 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     \item Introduction \bluecheck
     \vitem SMT solvers and proof certificates
     \vitem Lean
-    \vitem Proof scripts
     \vitem Certified approach
     \vitem Certifying approach
   \end{enumerate}
@@ -631,7 +625,8 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \frametitle{The SMT Problem}
   \begin{itemize}
     \item Boolean Satisfiability Problem (SAT)
-    \vitem Decide whether a given formula built with boolean variables and the operators $\wedge$, $\vee$ and $\neg$ is satisfiable
+    \vitem Input: a formula with Boolean variables connected with the operators $\wedge$, $\vee$ and $\neg$
+    \vitem Question: is there a way to assign values to the variables such that the formula evaluate to true?
   \end{itemize}
 \end{frame}
 
@@ -685,9 +680,9 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
       \item Equality and Uninterpreted Functions
       \item Linear Arithmetic
     \end{itemize}
-    \vitem Many-Sorted First Order Logic (MSFOL)
   \end{itemize}
 \end{frame}
+
 
 \begin{frame}
   \frametitle{The SMT Problem}
@@ -695,10 +690,11 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     \onslide<1-2>
     \medskip
     \begin{center}
-      $(x_{1} > x_{2}) \wedge (x_{2} \ge 0) \wedge (x_{1} < 2) \wedge (f(x_{1}) \not\simeq f(1) \vee x_{2} > 3)$ \\
+      $(x > 0) \wedge (x < 2) \wedge (f(x) \not\simeq f(1))$
+      % $(x_{1} > x_{2}) \wedge (x_{2} \ge 0) \wedge (x_{1} < 2) \wedge (f(x_{1}) \not\simeq f(1) \vee x_{2} > 3)$ \\
       % $ (x_{1} \ge 0) \wedge (x_{1} < 2) \wedge (x_{1} \times x_{2} \not\simeq 0) \wedge ((f(5x_{1}) \not\simeq f(5)) \vee (x_{2} \simeq 0)) $ \\
 
-      $x_{1}, x_{2} \in \mathbb{Z}$ \\
+      $x \in \mathbb{Z}$ \\
 
       $f : \mathbb{Z} \rightarrow \mathbb{Z}$
     \end{center}
@@ -717,9 +713,6 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \begin{itemize}
     \item SMT Solvers are systems that aim to solve the SMT problem
     \vitem In order to determine whether a given formula is satisfiable, they combine SAT solvers with theory specific solvers
-    \begin{itemize}
-      \item Theory specific solvers only deal with conjunctions of propositions
-    \end{itemize}
     \vitem Most of them accept the SMT-LIB format as input
   \end{itemize}
 \end{frame}
@@ -729,14 +722,12 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \begin{minted}{smtlib.py -x}
     (set-logic QF_UFLIA)
 
-    (declare-const x1 Int)
-    (declare-const x2 Int)
+    (declare-const x Int)
     (declare-fun f (Int) Int)
 
-    (assert (> x1 x2))
-    (assert (>= x2 0))
-    (assert (< x1 2))
-    (assert (or (not (= (f x1) (f 1))) (> x2 3)))
+    (assert (> x 0))
+    (assert (< x 2))
+    (assert (not (= (f x) (f 1)))
 
     (check-sat)
   \end{minted}
@@ -766,22 +757,33 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \begin{frame}
   \frametitle{Proof Certificates for Boolean Formulas}
     \begin{itemize}
-    \item Initially, assume that the input formula is in Conjunctive Normal Form (i.e. a conjunction of clauses)
-    \vitem Resolution Rule
+    \item Initially, assume that the input formula is in Conjunctive Normal Form (CNF)
     \begin{itemize}
-      \item Let $x$ be a variable and $C_{1}$ and $C_{2}$ be two clauses. If $x$ appears in $C_{1}$ and $\neg x$ appears in $C_{2}$, then from $C_{1} \wedge C_{2}$ we can conclude $C_{1}' \vee C_{2}'$, where $C_{1}'$ is $C_{1}$ without $x$ and $C_{2}'$ is $C_{2}$ without $\neg x$
+      \item This means that the formula is a conjunction of many clauses
+      \item A clause is a disjunction of variables
     \end{itemize}
-  \end{itemize}
+    \vitem Proof certificates for unsatisfiability of Boolean formulas in CNF rely on the \textit{resolution} rule:
           \vfill
+  \[
+    \infer[]{x_{1} \vee \cdots \vee x_{n} \vee y_{1} \vee \cdots \vee y_{m}}{a \vee x_{1} \vee \cdots \vee x_{n} & \neg a \vee y_{1} \vee \cdots \vee y_{m}}
+  \]
+  \vitem Example:
+            \vfill
           $$ (x_{1} \vee \neg x_{2} \vee \neg x_{3}) \wedge (x_{4} \vee \neg x_{1}) \Rightarrow \neg x_{2} \vee \neg x_{3} \vee x_{4} $$
+   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Proof Certificates for Boolean Formulas}
   \begin{itemize}
-    \item SAT solvers use the resolution rule to solve Boolean formulas in CNF
+    \item SAT solvers use the resolution rule to try to derive \textit{false} from a formula. If they can, the formula is unsatisfiable
     \vitem They can be modified to register each instance of resolution applied while they are solving a problem, which will produce a \textit{resolution tree}
-    \vitem Consider the formula $(x \vee y) \wedge (x \vee \neg y \vee z) \wedge (\neg x \vee z) \wedge  \neg z$. The following is a resolution tree certifying the unsatisfiability of this formula:
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Proof Certificates for Boolean Formulas}
+  \begin{itemize}
+    \item Consider the formula $(x \vee y) \wedge (x \vee \neg y \vee z) \wedge (\neg x \vee z) \wedge  \neg z$. The following is a resolution tree certifying the unsatisfiability of this formula:
   \end{itemize}
   \vfill
   \[
@@ -828,7 +830,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \frametitle{Proof Certificates for Equality and Uninterpreted Functions}
   \begin{itemize}
     \item Next, we consider the theory of Equality and Uninterpreted Functions
-    \vitem Variables can now also range over a special sort $U$ or be functions taking parameters from this sort
+    \vitem Formulas involving variables and functions taken from an arbitrary sort
     \vitem We also introduce an equality operator: $\simeq$
     \vitem Examples:
   \end{itemize}
@@ -891,6 +893,132 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     \item Since the Farkas' lemma guarantee that such coefficients always exist, the SMT solver can compute them and provide it as a proof certificate.
     % \vitem Linear Integer Arithmetic? Tight Bounds?
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Solver Architecture}
+  \begin{center}
+    \newcommand{\preprocopacity}{1}
+    \newcommand{\nopreprocopacity}{0}
+    \newcommand{\smtopacity}{0}
+    \newcommand{\tpopacity}{1}
+    \newcommand{\detailopacityprop}{1}
+    \newcommand{\detailopacity}{1}
+    \newcommand{\proofopacity}{1}
+    \newcommand{\proofsatopacity}{1}
+    \newcommand{\proofresultopacity}{1}
+    \newcommand{\proofresultarrowopacity}{1}
+    \newcommand{\proofsmtopacity}{1}
+    \newcommand{\satopacity}{0}
+    \newcommand{\unsatopacity}{1}
+\resizebox{0.85\linewidth}{!}{
+\tikzset{every picture/.style={line width=0.75pt}}
+\begin{tikzpicture}[
+    block/.style={
+      draw,
+      minimum width=7em,
+      minimum height=2em,
+      fill=white,
+      align=center,
+    },
+    theory/.style={
+      draw,
+      minimum width=2em,
+      minimum height=2em,
+      fill=white,
+      align=center,
+    },
+  ]
+
+  \node[opacity=\preprocopacity, block] (prep) {\textcolor{procColor}{Pre-processor}};
+  \node[opacity=\nopreprocopacity] (input) {\textcolor{thRwColor}{$\varphi$}};
+  \node[opacity=\preprocopacity, below=4em of prep] (phi)
+    {\textcolor{thRwColor}{$\varphi$}};
+  \draw[opacity=\preprocopacity, line] (phi) -- (prep);
+
+  \node[opacity=\detailopacityprop, block, right=12ex of prep] (clause) {\textcolor{cnfColor}{Clausifier}};
+  \node[opacity=\detailopacityprop, block, right=10ex of clause] (sat) {\textcolor{satColor}{SAT Solver}};
+  \node[opacity=\detailopacityprop, block, right=10ex of sat] (post) {Post-processor};
+  \draw[opacity=\detailopacityprop, line] (clause) -- node[above] {\scriptsize\textcolor{cnfColor}{$
+    C_1^\mathrm{p}\ \ldots\ C_m^\mathrm{p}$}} (sat);
+    % C_1\rrfloor_p\;...\;\llfloor C_m\rrfloor_p$} (sat);
+  \draw[opacity=\proofsatopacity, line] (sat) -- node[above] {\scriptsize\textcolor{satColor}{$P\!:\vec{C}\rightarrow\bot$}} (post);
+  \draw[opacity=\detailopacityprop, line] (clause.south) -- +(0,-1em) -- node[below,align=center]
+  {\scriptsize\textcolor{cnfColor}{$P\!: \psi_1\rightarrow C_1\ \ldots\ P\!: \psi_m\rightarrow C_m$}} ($(post.south)+(0,-1em)$) -- (post.south);
+
+  \node[opacity=\detailopacity, block,below=13em of clause.west,anchor=west] (comb) {\textcolor{thSolverColor}{Theory Combination}};
+  \node[opacity=\detailopacity, theory,right=10ex of comb,yshift=+3em] (t1) {\textcolor{thSolverColor}{$T_1$}};
+  \node[opacity=\detailopacity, theory,right=10ex of comb,yshift=-3em] (t2) {\textcolor{thSolverColor}{$T_2$}};
+  \path[opacity=\detailopacity, draw,line] (t1.west) to[bend right]
+    node[left,yshift=1ex]
+      {\scriptsize\textcolor{thSolverColor}{$L_1\hskip .8em P\!: L_1$}}
+      ($(comb.east)+(0,1ex)$);
+  \path[opacity=\detailopacity, draw,line] (t2.west) to[bend left]
+    node[left,yshift=-1ex]
+      {\scriptsize\textcolor{thSolverColor}{$L_2\hskip .8em P\!: L_2$}}
+      ($(comb.east)+(0,-1ex)$);
+  \node[opacity=\detailopacity, right=6ex of comb,minimum height=4ex] (tdots) {$\ldots$};
+  \node[opacity=\detailopacity, theory,right=10ex of tdots] (tk) {\textcolor{thSolverColor}{$T_k$}};
+  \draw[opacity=\detailopacity, line] (tdots) -- (comb);
+  \draw[opacity=\detailopacity] (tk) -- node[above]
+    {\scriptsize\textcolor{thSolverColor}{$L_k\hskip .5em P\!: L_k$}} (tdots);
+
+  \node[opacity=\proofopacity, block,right=8ex of post.east,yshift=4em] (smt) {SMT Proof Post-processor};
+  \node[opacity=\proofresultopacity, below=6em of smt] (p2) {\textcolor{thRwColor}{$P\!:\varphi\rightarrow\bot$}};
+  \draw[opacity=\proofresultarrowopacity, line] (smt) -- (p2);
+
+  \node[opacity=\unsatopacity, right=10ex of post.east,yshift=-4em, anchor=center] (b2) {\textcolor{thRwColor}{$\bot$}};
+  \node[opacity=\satopacity, right=10ex of post.east,yshift=4em, anchor=center] (sat) {sat};
+
+  \path (prep.north)+(0,5em) node (p0) {};
+  \draw[opacity=\proofopacity, line] (prep.north) -- +(0,5em) --
+    node[above]
+    {
+      \textcolor{procColor}{$P\!: \varphi\rightarrow\phi_1\ \ldots\ P\!: \varphi\rightarrow\phi_n$}
+    } ($(smt.north |- p0)$) -- (smt.north);
+
+  \begin{pgfonlayer}{background}
+    \path (clause.north west)+(-1.5em,7ex) node (c0) {};
+    \path (post.south east)+(1.5em,-5.1ex) node (c1) {};
+    \node at ($($(c1 -| c0)$)!0.5!(c1)$) (c2) {};
+    \path[opacity=\tpopacity, rounded corners, draw=gray!45, fill=gray!10] (c0) rectangle (c1);
+
+    \path (comb.west)+(-1.5em,6em) node (d0) {};
+    \path (c1)+(0em,-16em) node (d1) {};
+    \node at ($($(d0 -| d1)$)!0.5!(d0)$) (d2) {};
+    \path[opacity=\tpopacity, rounded corners, draw=gray!45, fill=gray!10] (d0) rectangle (d1);
+
+    \path[opacity=\smtopacity, rounded corners, draw=gray!45, fill=gray!10] (c0) rectangle (d1);
+  \end{pgfonlayer}
+
+  \node[opacity=\tpopacity, below=1ex of c0,xshift=1ex,anchor=north west] (pengine) {Propositional Engine};
+  \node[opacity=\tpopacity, below=1ex of d0,xshift=1ex,anchor=north west] (tengine) {Theory Engine};
+  \node[opacity=\smtopacity] at ($(c0)!0.5!(d1)$) (solver) {\textcolor{thRwColor}{SMT Solver}};
+
+  \path[opacity=\tpopacity, draw,rline,line width=0.75pt] (d2)+(-1em,0em) to[bend left=40]
+    node[left] {\textcolor{satColor}{Asserted Literals}}
+    ($(c2)+(-1em,0em)$);
+
+  \path[opacity=\detailopacity, draw,line,line width=0.75pt] (d2)+(1em,0em) to[bend right=40]
+    node[right,align=center] {\textcolor{thSolverColor}{$L$}\\[.5ex]\textcolor{thSolverColor}{$P\!: L$}}
+    ($(c2)+(1em,0em)$);
+
+  \path ($(prep.east -| c0)$) node (c3) {};
+  \draw[opacity=\preprocopacity, line] (prep.east) -- node[above]
+    {\textcolor{procColor}{$\vec \phi$}} (c3.center);
+
+  \draw[opacity=\nopreprocopacity, line] (input) -- (c3.center);
+
+  \path ($(post.east -| c1)$) node (c4) {};
+  \draw[opacity=\unsatopacity, line,line width=0.75pt] (c4)+(0ex,-1ex) -| (b2);
+
+  \draw[opacity=\satopacity, line,line width=0.75pt] (c4)+(0ex,1ex) -| (sat);
+
+  \draw[opacity=\proofsmtopacity, line,line width=0.75pt] (c4)+(0ex,1ex) -| ($(smt.south)+(-1ex,0ex)$) node[above,pos=0.25] {\textcolor{thRwColor}{$P\!:\vec \phi\rightarrow\bot$}};
+
+\end{tikzpicture}%
+}
+\end{center}
 \end{frame}
 
 \section{Lean}
@@ -982,8 +1110,12 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     intros n m
     induction n with
     | zero       => rw [add, add_zero]
-    | succ n' IH => rw [add, add_succ, IH]
+    | succ n' IH => -- goal: add (succ n') m = add m (succ n')
+      rw [add]      --       succ (add n' m) = add m (succ n')
+      rw [add_succ] --       succ (add n' m) = succ (add m n')
+      rw [IH]       --       succ (add m n') = succ (add m n')
   \end{minted}
+
 \end{frame}
 
 \begin{frame}
@@ -994,10 +1126,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
       \item The hammer is implemented as a tactic
     \end{itemize}
     \vitem They inspect the goal and the set of hypothesis via the internal representation used by Lean's compiler, the \texttt{Expr} type
-    \begin{itemize}
-      \item \texttt{inferType}, \texttt{evalTactic}
-    \end{itemize}
-    \vitem Based on this, they will usually generate a proof that will then be checked by the kernel
+    \vitem Based on this, they generate a proof that will then be checked by the kernel
   \end{itemize}
 \end{frame}
 
@@ -1092,6 +1221,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   def q: term := const 1001 boolSort
 
   def modusPonens: term := implies p (implies (implies p q) q)
+
   def notModusPonens: term := not modusPonens
   \end{minted}
 \end{frame}
