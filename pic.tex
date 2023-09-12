@@ -1,0 +1,107 @@
+\resizebox{0.85\linewidth}{!}{
+\tikzset{every picture/.style={line width=0.75pt}}
+\begin{tikzpicture}[
+    block/.style={
+      draw,
+      minimum width=7em,
+      minimum height=2em,
+      fill=white,
+      align=center,
+    },
+    theory/.style={
+      draw,
+      minimum width=2em,
+      minimum height=2em,
+      fill=white,
+      align=center,
+    },
+  ]
+
+  \node[opacity=\preprocopacity, block] (prep) {\textcolor{procColor}{Pre-processor}};
+  \node[opacity=\nopreprocopacity] (input) {\textcolor{thRwColor}{$\varphi$}};
+  \node[opacity=\preprocopacity, below=4em of prep] (phi)
+    {\textcolor{thRwColor}{$\varphi$}};
+  \draw[opacity=\preprocopacity, line] (phi) -- (prep);
+
+  \node[opacity=\detailopacityprop, block, right=12ex of prep] (clause) {\textcolor{cnfColor}{Clausifier}};
+  \node[opacity=\detailopacityprop, block, right=10ex of clause] (sat) {\textcolor{satColor}{SAT Solver}};
+  \node[opacity=\detailopacityprop, block, right=10ex of sat] (post) {Post-processor};
+  \draw[opacity=\detailopacityprop, line] (clause) -- node[above] {\scriptsize\textcolor{cnfColor}{$
+    C_1^\mathrm{p}\ \ldots\ C_m^\mathrm{p}$}} (sat);
+    % C_1\rrfloor_p\;...\;\llfloor C_m\rrfloor_p$} (sat);
+  \draw[opacity=\proofsatopacity, line] (sat) -- node[above] {\scriptsize\textcolor{satColor}{$P\!:\vec{C}\rightarrow\bot$}} (post);
+  \draw[opacity=\detailopacityprop, line] (clause.south) -- +(0,-1em) -- node[below,align=center]
+  {\scriptsize\textcolor{cnfColor}{$P\!: \psi_1\rightarrow C_1\ \ldots\ P\!: \psi_m\rightarrow C_m$}} ($(post.south)+(0,-1em)$) -- (post.south);
+
+  \node[opacity=\detailopacity, block,below=13em of clause.west,anchor=west] (comb) {\textcolor{thSolverColor}{Theory Combination}};
+  \node[opacity=\detailopacity, theory,right=10ex of comb,yshift=+3em] (t1) {\textcolor{thSolverColor}{$T_1$}};
+  \node[opacity=\detailopacity, theory,right=10ex of comb,yshift=-3em] (t2) {\textcolor{thSolverColor}{$T_2$}};
+  \path[opacity=\detailopacity, draw,line] (t1.west) to[bend right]
+    node[left,yshift=1ex]
+      {\scriptsize\textcolor{thSolverColor}{$L_1\hskip .8em P\!: L_1$}}
+      ($(comb.east)+(0,1ex)$);
+  \path[opacity=\detailopacity, draw,line] (t2.west) to[bend left]
+    node[left,yshift=-1ex]
+      {\scriptsize\textcolor{thSolverColor}{$L_2\hskip .8em P\!: L_2$}}
+      ($(comb.east)+(0,-1ex)$);
+  \node[opacity=\detailopacity, right=6ex of comb,minimum height=4ex] (tdots) {$\ldots$};
+  \node[opacity=\detailopacity, theory,right=10ex of tdots] (tk) {\textcolor{thSolverColor}{$T_k$}};
+  \draw[opacity=\detailopacity, line] (tdots) -- (comb);
+  \draw[opacity=\detailopacity] (tk) -- node[above]
+    {\scriptsize\textcolor{thSolverColor}{$L_k\hskip .5em P\!: L_k$}} (tdots);
+
+  \node[opacity=\proofopacity, block,right=8ex of post.east,yshift=4em] (smt) {SMT Proof Post-processor};
+  \node[opacity=\proofresultopacity, below=6em of smt] (p2) {\textcolor{thRwColor}{$P\!:\varphi\rightarrow\bot$}};
+  \draw[opacity=\proofresultarrowopacity, line] (smt) -- (p2);
+
+  \node[opacity=\unsatopacity, right=10ex of post.east,yshift=-4em, anchor=center] (b2) {\textcolor{thRwColor}{$\bot$}};
+  \node[opacity=\satopacity, right=10ex of post.east,yshift=4em, anchor=center] (sat) {sat};
+
+  \path (prep.north)+(0,5em) node (p0) {};
+  \draw[opacity=\proofopacity, line] (prep.north) -- +(0,5em) --
+    node[above]
+    {
+      \textcolor{procColor}{$P\!: \varphi\rightarrow\phi_1\ \ldots\ P\!: \varphi\rightarrow\phi_n$}
+    } ($(smt.north |- p0)$) -- (smt.north);
+
+  \begin{pgfonlayer}{background}
+    \path (clause.north west)+(-1.5em,7ex) node (c0) {};
+    \path (post.south east)+(1.5em,-5.1ex) node (c1) {};
+    \node at ($($(c1 -| c0)$)!0.5!(c1)$) (c2) {};
+    \path[opacity=\tpopacity, rounded corners, draw=gray!45, fill=gray!10] (c0) rectangle (c1);
+
+    \path (comb.west)+(-1.5em,6em) node (d0) {};
+    \path (c1)+(0em,-16em) node (d1) {};
+    \node at ($($(d0 -| d1)$)!0.5!(d0)$) (d2) {};
+    \path[opacity=\tpopacity, rounded corners, draw=gray!45, fill=gray!10] (d0) rectangle (d1);
+
+    \path[opacity=\smtopacity, rounded corners, draw=gray!45, fill=gray!10] (c0) rectangle (d1);
+  \end{pgfonlayer}
+
+  \node[opacity=\tpopacity, below=1ex of c0,xshift=1ex,anchor=north west] (pengine) {Propositional Engine};
+  \node[opacity=\tpopacity, below=1ex of d0,xshift=1ex,anchor=north west] (tengine) {Theory Engine};
+  \node[opacity=\smtopacity] at ($(c0)!0.5!(d1)$) (solver) {\textcolor{thRwColor}{SMT Solver}};
+
+  \path[opacity=\tpopacity, draw,rline,line width=0.75pt] (d2)+(-1em,0em) to[bend left=40]
+    node[left] {\textcolor{satColor}{Asserted Literals}}
+    ($(c2)+(-1em,0em)$);
+
+  \path[opacity=\detailopacity, draw,line,line width=0.75pt] (d2)+(1em,0em) to[bend right=40]
+    node[right,align=center] {\textcolor{thSolverColor}{$L$}\\[.5ex]\textcolor{thSolverColor}{$P\!: L$}}
+    ($(c2)+(1em,0em)$);
+
+  \path ($(prep.east -| c0)$) node (c3) {};
+  \draw[opacity=\preprocopacity, line] (prep.east) -- node[above]
+    {\textcolor{procColor}{$\vec \phi$}} (c3.center);
+
+  \draw[opacity=\nopreprocopacity, line] (input) -- (c3.center);
+
+  \path ($(post.east -| c1)$) node (c4) {};
+  \draw[opacity=\unsatopacity, line,line width=0.75pt] (c4)+(0ex,-1ex) -| (b2);
+
+  \draw[opacity=\satopacity, line,line width=0.75pt] (c4)+(0ex,1ex) -| (sat);
+
+  \draw[opacity=\proofsmtopacity, line,line width=0.75pt] (c4)+(0ex,1ex) -| ($(smt.south)+(-1ex,0ex)$) node[above,pos=0.25] {\textcolor{thRwColor}{$P\!:\vec \phi\rightarrow\bot$}};
+
+\end{tikzpicture}%
+}

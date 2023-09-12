@@ -596,7 +596,8 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \begin{itemize}
     \item Checking results obtained by the ATP
     \begin{itemize}
-      \item Carcara
+      \item Carcara is an example of other tool that does this
+      \item It is much faster than our tool, but it works on a very different setting
     \end{itemize}
     \vitem The ITP is more reliable than an independent checker
     \begin{itemize}
@@ -616,6 +617,8 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     \vitem Lean
     \vitem Certified approach
     \vitem Certifying approach
+    \vitem Demo
+    \vitem Evaluation
   \end{enumerate}
 \end{frame}
 
@@ -675,10 +678,21 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
     \end{itemize}
     \vitem Variables can range over different domains (sorts) apart from Boolean
     \vitem Operators from these domains are also added
-    \vitem Theories of our interest:
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{The SMT Problem}
+  \begin{itemize}
+    \item Theories we currently cover:
     \begin{itemize}
+      \item Boolean (essential for capturing the reasoning over SMT formulas)
       \item Equality and Uninterpreted Functions
       \item Linear Arithmetic
+    \end{itemize}
+    \vitem Ongoing work:
+    \begin{itemize}
+      \item Non-linear arithmetic
+      \item Quantifiers
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -736,23 +750,11 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \begin{frame}
   \frametitle{SMT Solvers}
   \begin{itemize}
-    \item Furthermore, some SMT solvers (including cvc5) can produce a proof certificate that supports the result found for a given formula
+    \item Furthermore, some SMT solvers (including cvc5) can produce a certificate that supports the result found for a given formula
     \vitem For ``SAT'' results this is easy: just show the valuation of the variables
     \vitem What about ``UNSAT'' results?
   \end{itemize}
 \end{frame}
-
-% \begin{frame}
-%   \frametitle{Proof Certificates for Boolean Formulas}
-%   \begin{itemize}
-%     \item Conjunctive Normal Form Transformation
-%     \begin{itemize}
-%       \item Representing the formula as a conjunction of clauses
-%     \end{itemize}
-%   \end{itemize}
-%   \vfill
-%       $$(x_{1} \vee \neg (x_{2} \wedge x_{3})) \wedge \neg (x_{1} \wedge \neg x_{4}) \Rightarrow (x_{1} \vee \neg x_{2} \vee \neg x_{3}) \wedge (\neg x_{1} \vee x_{4})$$
-% \end{frame}
 
 \begin{frame}
   \frametitle{Proof Certificates for Boolean Formulas}
@@ -776,8 +778,9 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \begin{frame}
   \frametitle{Proof Certificates for Boolean Formulas}
   \begin{itemize}
-    \item SAT solvers use the resolution rule to try to derive \textit{false} from a formula. If they can, the formula is unsatisfiable
-    \vitem They can be modified to register each instance of resolution applied while they are solving a problem, which will produce a \textit{resolution tree}
+    \item The algorithm employed by SAT solvers to solve the SAT problem relies on the resolution rule
+    \vitem We can represent their reasoning with a sequence of applications of resolution
+    \vitem By modifying them so they register each instance of resolution applied, we can obtain a \textit{resolution tree}, which is a suitable certificate for ``UNSAT'' result in Boolean formulas
   \end{itemize}
 \end{frame}
 \begin{frame}
@@ -865,8 +868,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \begin{frame}
   \frametitle{Proof Certificates for Linear Arithmetic}
   \begin{itemize}
-    \item In the theory of Linear Arithmetic, we consider numeric variables that can be added and scaled by constants
-    \vitem Linear Integer Arithmetic vs Linear Real Arithmetic
+    \item In the theory of Linear Arithmetic, we consider variables ranging over reals or integers that can be added and scaled by constants
     \vitem General form of a term:
   \end{itemize}
   \[
@@ -896,130 +898,167 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Solver Architecture}
-  \begin{center}
-    \newcommand{\preprocopacity}{1}
-    \newcommand{\nopreprocopacity}{0}
-    \newcommand{\smtopacity}{0}
-    \newcommand{\tpopacity}{1}
-    \newcommand{\detailopacityprop}{1}
-    \newcommand{\detailopacity}{1}
-    \newcommand{\proofopacity}{1}
-    \newcommand{\proofsatopacity}{1}
-    \newcommand{\proofresultopacity}{1}
-    \newcommand{\proofresultarrowopacity}{1}
-    \newcommand{\proofsmtopacity}{1}
-    \newcommand{\satopacity}{0}
-    \newcommand{\unsatopacity}{1}
-\resizebox{0.85\linewidth}{!}{
-\tikzset{every picture/.style={line width=0.75pt}}
-\begin{tikzpicture}[
-    block/.style={
-      draw,
-      minimum width=7em,
-      minimum height=2em,
-      fill=white,
-      align=center,
-    },
-    theory/.style={
-      draw,
-      minimum width=2em,
-      minimum height=2em,
-      fill=white,
-      align=center,
-    },
-  ]
-
-  \node[opacity=\preprocopacity, block] (prep) {\textcolor{procColor}{Pre-processor}};
-  \node[opacity=\nopreprocopacity] (input) {\textcolor{thRwColor}{$\varphi$}};
-  \node[opacity=\preprocopacity, below=4em of prep] (phi)
-    {\textcolor{thRwColor}{$\varphi$}};
-  \draw[opacity=\preprocopacity, line] (phi) -- (prep);
-
-  \node[opacity=\detailopacityprop, block, right=12ex of prep] (clause) {\textcolor{cnfColor}{Clausifier}};
-  \node[opacity=\detailopacityprop, block, right=10ex of clause] (sat) {\textcolor{satColor}{SAT Solver}};
-  \node[opacity=\detailopacityprop, block, right=10ex of sat] (post) {Post-processor};
-  \draw[opacity=\detailopacityprop, line] (clause) -- node[above] {\scriptsize\textcolor{cnfColor}{$
-    C_1^\mathrm{p}\ \ldots\ C_m^\mathrm{p}$}} (sat);
-    % C_1\rrfloor_p\;...\;\llfloor C_m\rrfloor_p$} (sat);
-  \draw[opacity=\proofsatopacity, line] (sat) -- node[above] {\scriptsize\textcolor{satColor}{$P\!:\vec{C}\rightarrow\bot$}} (post);
-  \draw[opacity=\detailopacityprop, line] (clause.south) -- +(0,-1em) -- node[below,align=center]
-  {\scriptsize\textcolor{cnfColor}{$P\!: \psi_1\rightarrow C_1\ \ldots\ P\!: \psi_m\rightarrow C_m$}} ($(post.south)+(0,-1em)$) -- (post.south);
-
-  \node[opacity=\detailopacity, block,below=13em of clause.west,anchor=west] (comb) {\textcolor{thSolverColor}{Theory Combination}};
-  \node[opacity=\detailopacity, theory,right=10ex of comb,yshift=+3em] (t1) {\textcolor{thSolverColor}{$T_1$}};
-  \node[opacity=\detailopacity, theory,right=10ex of comb,yshift=-3em] (t2) {\textcolor{thSolverColor}{$T_2$}};
-  \path[opacity=\detailopacity, draw,line] (t1.west) to[bend right]
-    node[left,yshift=1ex]
-      {\scriptsize\textcolor{thSolverColor}{$L_1\hskip .8em P\!: L_1$}}
-      ($(comb.east)+(0,1ex)$);
-  \path[opacity=\detailopacity, draw,line] (t2.west) to[bend left]
-    node[left,yshift=-1ex]
-      {\scriptsize\textcolor{thSolverColor}{$L_2\hskip .8em P\!: L_2$}}
-      ($(comb.east)+(0,-1ex)$);
-  \node[opacity=\detailopacity, right=6ex of comb,minimum height=4ex] (tdots) {$\ldots$};
-  \node[opacity=\detailopacity, theory,right=10ex of tdots] (tk) {\textcolor{thSolverColor}{$T_k$}};
-  \draw[opacity=\detailopacity, line] (tdots) -- (comb);
-  \draw[opacity=\detailopacity] (tk) -- node[above]
-    {\scriptsize\textcolor{thSolverColor}{$L_k\hskip .5em P\!: L_k$}} (tdots);
-
-  \node[opacity=\proofopacity, block,right=8ex of post.east,yshift=4em] (smt) {SMT Proof Post-processor};
-  \node[opacity=\proofresultopacity, below=6em of smt] (p2) {\textcolor{thRwColor}{$P\!:\varphi\rightarrow\bot$}};
-  \draw[opacity=\proofresultarrowopacity, line] (smt) -- (p2);
-
-  \node[opacity=\unsatopacity, right=10ex of post.east,yshift=-4em, anchor=center] (b2) {\textcolor{thRwColor}{$\bot$}};
-  \node[opacity=\satopacity, right=10ex of post.east,yshift=4em, anchor=center] (sat) {sat};
-
-  \path (prep.north)+(0,5em) node (p0) {};
-  \draw[opacity=\proofopacity, line] (prep.north) -- +(0,5em) --
-    node[above]
-    {
-      \textcolor{procColor}{$P\!: \varphi\rightarrow\phi_1\ \ldots\ P\!: \varphi\rightarrow\phi_n$}
-    } ($(smt.north |- p0)$) -- (smt.north);
-
-  \begin{pgfonlayer}{background}
-    \path (clause.north west)+(-1.5em,7ex) node (c0) {};
-    \path (post.south east)+(1.5em,-5.1ex) node (c1) {};
-    \node at ($($(c1 -| c0)$)!0.5!(c1)$) (c2) {};
-    \path[opacity=\tpopacity, rounded corners, draw=gray!45, fill=gray!10] (c0) rectangle (c1);
-
-    \path (comb.west)+(-1.5em,6em) node (d0) {};
-    \path (c1)+(0em,-16em) node (d1) {};
-    \node at ($($(d0 -| d1)$)!0.5!(d0)$) (d2) {};
-    \path[opacity=\tpopacity, rounded corners, draw=gray!45, fill=gray!10] (d0) rectangle (d1);
-
-    \path[opacity=\smtopacity, rounded corners, draw=gray!45, fill=gray!10] (c0) rectangle (d1);
-  \end{pgfonlayer}
-
-  \node[opacity=\tpopacity, below=1ex of c0,xshift=1ex,anchor=north west] (pengine) {Propositional Engine};
-  \node[opacity=\tpopacity, below=1ex of d0,xshift=1ex,anchor=north west] (tengine) {Theory Engine};
-  \node[opacity=\smtopacity] at ($(c0)!0.5!(d1)$) (solver) {\textcolor{thRwColor}{SMT Solver}};
-
-  \path[opacity=\tpopacity, draw,rline,line width=0.75pt] (d2)+(-1em,0em) to[bend left=40]
-    node[left] {\textcolor{satColor}{Asserted Literals}}
-    ($(c2)+(-1em,0em)$);
-
-  \path[opacity=\detailopacity, draw,line,line width=0.75pt] (d2)+(1em,0em) to[bend right=40]
-    node[right,align=center] {\textcolor{thSolverColor}{$L$}\\[.5ex]\textcolor{thSolverColor}{$P\!: L$}}
-    ($(c2)+(1em,0em)$);
-
-  \path ($(prep.east -| c0)$) node (c3) {};
-  \draw[opacity=\preprocopacity, line] (prep.east) -- node[above]
-    {\textcolor{procColor}{$\vec \phi$}} (c3.center);
-
-  \draw[opacity=\nopreprocopacity, line] (input) -- (c3.center);
-
-  \path ($(post.east -| c1)$) node (c4) {};
-  \draw[opacity=\unsatopacity, line,line width=0.75pt] (c4)+(0ex,-1ex) -| (b2);
-
-  \draw[opacity=\satopacity, line,line width=0.75pt] (c4)+(0ex,1ex) -| (sat);
-
-  \draw[opacity=\proofsmtopacity, line,line width=0.75pt] (c4)+(0ex,1ex) -| ($(smt.south)+(-1ex,0ex)$) node[above,pos=0.25] {\textcolor{thRwColor}{$P\!:\vec \phi\rightarrow\bot$}};
-
-\end{tikzpicture}%
-}
-\end{center}
+  \frametitle{Proof Certificates for Preprocessing Steps}
+  \begin{itemize}
+    \item The final proof certificate will be a combination for the formats of certificates for each theory
+    \vitem The SMT solver also can perform preprocessing steps in the input formula to simplify it, which will be added in the final certificate
+    \begin{itemize}
+      \item An example of such simplification is rewriting known formulas, like $x + 0 = x$
+    \end{itemize}
+    \vitem These preprocessing steps should be justified, but cvc5 currently can't produce proof certificates for them. Instead, they are added as hypothesis in the final proof
+  \end{itemize}
 \end{frame}
+
+% \begin{frame}[t]
+%   \frametitle{Solver Architecture}
+%   \begin{center}
+%   \centering
+%   \only<1>{
+%     \newcommand{\preprocopacity}{0}
+%     \newcommand{\nopreprocopacity}{1}
+%     \newcommand{\smtopacity}{1}
+%     \newcommand{\tpopacity}{0}
+%     \newcommand{\detailopacityprop}{0}
+%     \newcommand{\detailopacity}{0}
+%     \newcommand{\proofopacity}{0}
+%     \newcommand{\proofsatopacity}{0}
+%     \newcommand{\proofresultopacity}{1}
+%     \newcommand{\proofresultarrowopacity}{0}
+%     \newcommand{\proofsmtopacity}{0}
+%     \newcommand{\satopacity}{0}
+%     \newcommand{\unsatopacity}{1}
+%     \input{pic}
+%   }%
+%   \only<2>{
+%     \newcommand{\preprocopacity}{1}
+%     \newcommand{\nopreprocopacity}{0}
+%     \newcommand{\smtopacity}{1}
+%     \newcommand{\tpopacity}{0}
+%     \newcommand{\detailopacityprop}{0}
+%     \newcommand{\detailopacity}{0}
+%     \newcommand{\proofopacity}{0}
+%     \newcommand{\proofsatopacity}{0}
+%     \newcommand{\proofresultopacity}{0}
+%     \newcommand{\proofresultarrowopacity}{0}
+%     \newcommand{\proofsmtopacity}{0}
+%     \newcommand{\satopacity}{0}
+%     \newcommand{\unsatopacity}{0}
+%     \input{pic}
+%   }%
+%   \only<3>{
+%     \newcommand{\preprocopacity}{1}
+%     \newcommand{\nopreprocopacity}{0}
+%     \newcommand{\smtopacity}{1}
+%     \newcommand{\tpopacity}{0}
+%     \newcommand{\detailopacityprop}{0}
+%     \newcommand{\detailopacity}{0}
+%     \newcommand{\proofopacity}{1}
+%     \newcommand{\proofsatopacity}{0}
+%     \newcommand{\proofresultopacity}{0}
+%     \newcommand{\proofresultarrowopacity}{0}
+%     \newcommand{\proofsmtopacity}{0}
+%     \newcommand{\satopacity}{0}
+%     \newcommand{\unsatopacity}{0}
+%     \input{pic}
+%   }%
+%   \only<4>{
+%     \newcommand{\preprocopacity}{1}
+%     \newcommand{\nopreprocopacity}{0}
+%     \newcommand{\smtopacity}{0}
+%     \newcommand{\tpopacity}{1}
+%     \newcommand{\detailopacityprop}{1}
+%     \newcommand{\detailopacity}{0}
+%     \newcommand{\proofopacity}{1}
+%     \newcommand{\proofsatopacity}{0}
+%     \newcommand{\proofresultopacity}{0}
+%     \newcommand{\proofresultarrowopacity}{0}
+%     \newcommand{\proofsmtopacity}{0}
+%     \newcommand{\satopacity}{0}
+%     \newcommand{\unsatopacity}{0}
+%     \input{pic}
+%   }%
+%   \only<5>{
+%     \newcommand{\preprocopacity}{1}
+%     \newcommand{\nopreprocopacity}{0}
+%     \newcommand{\smtopacity}{0}
+%     \newcommand{\tpopacity}{1}
+%     \newcommand{\detailopacityprop}{1}
+%     \newcommand{\detailopacity}{1}
+%     \newcommand{\proofopacity}{1}
+%     \newcommand{\proofsatopacity}{0}
+%     \newcommand{\proofresultopacity}{0}
+%     \newcommand{\proofresultarrowopacity}{0}
+%     \newcommand{\proofsmtopacity}{0}
+%     \newcommand{\satopacity}{0}
+%     \newcommand{\unsatopacity}{0}
+%     \input{pic}
+%   }%
+%   \only<6>{
+%     \newcommand{\preprocopacity}{1}
+%     \newcommand{\nopreprocopacity}{0}
+%     \newcommand{\smtopacity}{0}
+%     \newcommand{\tpopacity}{1}
+%     \newcommand{\detailopacityprop}{1}
+%     \newcommand{\detailopacity}{1}
+%     \newcommand{\proofopacity}{1}
+%     \newcommand{\proofsatopacity}{1}
+%     \newcommand{\proofresultopacity}{0}
+%     \newcommand{\proofresultarrowopacity}{0}
+%     \newcommand{\proofsmtopacity}{0}
+%     \newcommand{\satopacity}{0}
+%     \newcommand{\unsatopacity}{0}
+%     \input{pic}
+%   }%
+%   \only<7>{
+%     \newcommand{\preprocopacity}{1}
+%     \newcommand{\nopreprocopacity}{0}
+%     \newcommand{\smtopacity}{0}
+%     \newcommand{\tpopacity}{1}
+%     \newcommand{\detailopacityprop}{1}
+%     \newcommand{\detailopacity}{1}
+%     \newcommand{\proofopacity}{1}
+%     \newcommand{\proofsatopacity}{1}
+%     \newcommand{\proofresultopacity}{0}
+%     \newcommand{\proofresultarrowopacity}{0}
+%     \newcommand{\proofsmtopacity}{1}
+%     \newcommand{\satopacity}{0}
+%     \newcommand{\unsatopacity}{1}
+%     \input{pic}
+%   }%
+%   \only<8>{
+%     \newcommand{\preprocopacity}{1}
+%     \newcommand{\nopreprocopacity}{0}
+%     \newcommand{\smtopacity}{0}
+%     \newcommand{\tpopacity}{1}
+%     \newcommand{\detailopacityprop}{1}
+%     \newcommand{\detailopacity}{1}
+%     \newcommand{\proofopacity}{1}
+%     \newcommand{\proofsatopacity}{1}
+%     \newcommand{\proofresultopacity}{1}
+%     \newcommand{\proofresultarrowopacity}{1}
+%     \newcommand{\proofsmtopacity}{1}
+%     \newcommand{\satopacity}{0}
+%     \newcommand{\unsatopacity}{1}
+%     \input{pic}
+%   }
+
+
+%     % \newcommand{\preprocopacity}{1}
+%     % \newcommand{\nopreprocopacity}{0}
+%     % \newcommand{\smtopacity}{0}
+%     % \newcommand{\tpopacity}{1}
+%     % \newcommand{\detailopacityprop}{1}
+%     % \newcommand{\detailopacity}{1}
+%     % \newcommand{\proofopacity}{1}
+%     % \newcommand{\proofsatopacity}{1}
+%     % \newcommand{\proofresultopacity}{1}
+%     % \newcommand{\proofresultarrowopacity}{1}
+%     % \newcommand{\proofsmtopacity}{1}
+%     % \newcommand{\satopacity}{0}
+%     % \newcommand{\unsatopacity}{1}
+%     % \input{pic.tex}
+% \end{center}
+% \end{frame}
 
 \section{Lean}
 
@@ -1027,7 +1066,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \frametitle{Lean}
   \begin{itemize}
     \item Lean is both a functional programming language and a proof assistant
-    \vitem Its features include algebraic datatypes, pattern matching, polymorphism, typeclasses, side effect support with monads and a robust macro system
+    \vitem Its features include algebraic datatypes, pattern matching, polymorphism, typeclasses and a robust macro system
     % \begin{itemize}
     %   \item It implements the correspondence between propositions and types
     %   \item The proof checker and the type checker are the same piece of code, a kernel with less than 7500 lines
@@ -1040,38 +1079,33 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \frametitle{Lean as a Programming Language}
   \begin{minted}{lean}
     inductive Natural where
-      | zero : Natural
-      | succ : Natural -> Natural
+    | zero : Natural
+    | succ : Natural -> Natural
 
     open Natural
 
-    def add (n m : Natural) : Natural :=
-      match n with
-      | zero    => m
-      | succ n' => succ (add n' m)
+    def add : Natural -> Natural -> Natural :=
+      fun n m =>
+        match n with
+        | zero    => m
+        | succ n' => succ (add n' m)
 
     notation x " + " y => add x y
   \end{minted}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Lean as an Interactive Theorem Prover}
   \begin{itemize}
-    \item Proofs are defined in the same way as functions and can refer to any value defined by the user
-    \begin{itemize}
-      \item Correspondence between types and propositions
-    \end{itemize}
-    \vitem Interaction with the compiler
-    \begin{itemize}
-      \item Consulting the current goal and set of hypothesis
-      \item Checking if each step was valid
-    \end{itemize}
+    \item Theorems and proofs are represented in Lean via the correspondence between propositions and types
+    \vitem We define theorems using the same pattern for defining programs
+
   \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Lean as an Interactive Theorem Prover}
-  \begin{minted}[fontsize=\footnotesize]{lean}
+  \begin{minted}{lean}
   theorem add_zero : ∀ (n : Natural), (n + zero) = n :=
     fun n =>
       match n with
@@ -1080,11 +1114,16 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
       -- add_zero n' is a proof for n' + zero = n'
       -- congrArg succ is a proof for x = y -> succ x = succ y
 
-  theorem add_succ : ∀ (n m : Natural), (n + succ m) = succ (n + m) := fun n m =>
+  theorem add_succ : ∀ (n m : Natural),
+      (n + succ m) = succ (n + m) := fun n m =>
     match n with
     | zero    => rfl
     | succ n' => congrArg succ (add_succ n' m)
-
+  \end{minted}
+\end{frame}
+\begin{frame}[fragile]
+  \frametitle{Lean as an Interactive Theorem Prover}
+  \begin{minted}{lean}
   theorem add_comm : ∀ (n m : Natural), (n + m) = (m + n) := fun n m =>
     match n with
     | zero    => Eq.symm (add_zero m)
@@ -1098,8 +1137,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \begin{itemize}
     \item Since we have to specify each detail, even proofs for very simple theorems become hard to read and write
     \vitem Many modern ITPs offer an alternative way for building proofs: tactics
-    \vitem They are routines capable of safely applying transformations on the goal on the fly
-    \vitem They can contain arbitrary pieces of code
+    \vitem They are routines capable of safely applying transformations on the goal on the fly. These routines can contain arbitrary pieces of code
   \end{itemize}
 \end{frame}
 
@@ -1145,64 +1183,49 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 
 \end{frame}
 
-% \begin{frame}
-%   \frametitle{Classical vs Intuitionistic}
-%   \begin{itemize}
-%     \item Lean's logical framework is intuitionistic
-%     \begin{itemize}
-%       \item Only constructive proofs are allowed, it is impossible to prove the law of excluded middle
-%     \end{itemize}
-%     \vitem SMT solvers' logical framework is classical
-%     \begin{itemize}
-%       \item We will translate Lean theorems to the unsatisfiability of SMT problems through elimination of double negation, which is not provable constructively
-%     \end{itemize}
-%     \vitem Solution: introduction of axioms
-%     \begin{itemize}
-%       \item Lean's \texttt{Classical} module
-%     \end{itemize}
-%   \end{itemize}
-% \end{frame}
-
-\section{Proof Certificates in Lean}
-
-\begin{frame}
-  \frametitle{Proof Certificates in Lean}
-  \begin{itemize}
-    \item cvc5 has a module for exporting proof certificates as scripts in Lean
-    \vitem The logical rules used by cvc5 are encoded as axioms in these scripts, so Lean only check whether the rules were applied correctly
-    \vitem The theorems are stated in Lean using a custom type (\texttt{term}) that represents MSFOL formulas, instead of native Lean terms
-    \begin{itemize}
-      \item Its easier to manipulate a \texttt{term} than a proposition
-    \end{itemize}
-
-  \end{itemize}
-\end{frame}
+\section{Reconstructing Proofs with Certified Transformations}
 
 \begin{frame}[fragile]
-  \frametitle{Proof Certificates in Lean}
+  \frametitle{Certified Transformations}
   \begin{itemize}
-    \item Example: Modus Ponens ($\neg (p \rightarrow (p \rightarrow q) \rightarrow q)$)
+    \item Consider the following SMT problem, which represents the negation of modus ponens ($\neg (p \rightarrow (p \rightarrow q) \rightarrow q)$)
   \end{itemize}
   \vfill
+  \centering
   \begin{minted}{smtlib.py -x}
     (set-logic QF_UF)
     (declare-const p Bool)
     (declare-const q Bool)
     (assert (not (=> p (=> (=> p q) q))))
   \end{minted}
+  \vfill
+  \begin{itemize}
+    \item The unsatisfiability of this formula implies that modus ponens is \textit{valid} (evaluates to true for all assignments of variables)
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Proof Certificates in Lean}
+  \begin{itemize}
+    \item Using it as input to cvc5, we obtain the following proof:
+  \end{itemize}
   \centering
-  \includegraphics[height=0.8\textheight]{images/mp_cvc5_proof.png}
-  % \[
-    % \infer[]{\bot}{\infer[]{q}{\infer[]{\neg p \vee q}{\infer[]{p \rightarrow q}{\infer[]{\neg ((p \rightarrow q) \rightarrow q)}{\neg (p \rightarrow (p \rightarrow q) \rightarrow q)}}} & \infer[]{p}{\neg (p \rightarrow (p \rightarrow q) \rightarrow q)}} & \infer[]{\neg q}{\infer[]{\neg ((p \rightarrow q) \rightarrow q)}{\neg (p \rightarrow (p \rightarrow q) \rightarrow q)}}}
-  % \]
+  \vfill
+  % \includegraphics[height=0.8\textheight]{images/mp_cvc5_proof.png}
+  \[
+    \infer[]{\bot}{\infer[]{q}{\infer[]{\neg p \vee q}{\infer[]{p \rightarrow q}{\infer[]{\neg ((p \rightarrow q) \rightarrow q)}{\neg (p \rightarrow (p \rightarrow q) \rightarrow q)}}} & \infer[]{p}{\neg (p \rightarrow (p \rightarrow q) \rightarrow q)}} & \infer[]{\neg q}{\infer[]{\neg ((p \rightarrow q) \rightarrow q)}{\neg (p \rightarrow (p \rightarrow q) \rightarrow q)}}}
+  \]
+  \begin{itemize}
+    \item Let's encode it in Lean!
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Proof Certificates in Lean}
+  \begin{itemize}
+    \item We will use the type below to represent formulas
+  \end{itemize}
+  \vfill
   \begin{minted}{lean}
   inductive term where
   | const   : Nat -> sort -> term
@@ -1215,55 +1238,25 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Proof Certificates in Lean}
+  \frametitle{Certified Transformations}
+  \begin{itemize}
+    \item Now the formula representing the negation of modus ponens can be encoded as:
+  \end{itemize}
+  \vfill
   \begin{minted}{lean}
   def p: term := const 1000 boolSort
   def q: term := const 1001 boolSort
 
-  def modusPonens: term := implies p (implies (implies p q) q)
-
-  def notModusPonens: term := not modusPonens
+  def notModusPonens: term := not (implies p (implies (implies p q) q))
   \end{minted}
 \end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Proof Certificates in Lean}
-  \begin{minted}{lean}
-  axiom thHolds : term -> Prop
-
-  axiom notImplies1 : ∀ {t1 t2 : term},
-    thHolds (not (implies t1 t2)) -> thHolds t1
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Proof Certificates in Lean}
-  \begin{minted}{lean}
-  theorem cvc5_th0 : thHolds notModusPonens -> thHolds bot :=
-    fun lean_a0 =>
-      have lean_s0 := notImplies2 lean_a0
-      have lean_s1 := notImplies1 lean_s0
-      have lean_s2 := impliesElim lean_s1
-      have lean_s4 := notImplies1 lean_a0
-      have lean_s6 := R1 (conjunction lean_s2 lean_s4)
-      have lean_s9 := notImplies2 lean_s0
-      contradiction (conjunction lean_s9 lean_s6)
-  \end{minted}
-\end{frame}
-
-\section{Certified Transformations}
 
 \begin{frame}
   \frametitle{Certified Transformations}
   \begin{itemize}
-    \item We want to make these rules verifiable by Lean's kernel
-    \vitem The first way we will show is to turn them into \textit{theorems} and prove that they are ``correct''
-    \begin{itemize}
-      \item This is known as the certified approach
-      \item Each rule is viewed as a certified function that maps ``valid'' terms into ``valid'' terms
-    \end{itemize}
-    \vitem We will map \texttt{term}s into \texttt{Prop}s. Then, we will be able to prove that a \texttt{term} is correct by proving the corresponding \texttt{Prop}
-    \vitem Initially we will assume that the \texttt{term} always represents a Boolean value
+    \item Now we need to lift these terms to Props, that is, to expressions that can be proved inside Lean
+    \vitem Let's define a function that does that. We can't map terms directly to Props since terms can have free variables, while Props can't, so our function will also receive an \textit{interpretation} for the free variables
+    \vitem For now we will only consider terms representing Boolean expressions
   \end{itemize}
 \end{frame}
 
@@ -1287,42 +1280,62 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \begin{frame}[fragile]
   \frametitle{Certified Transformations}
   \begin{itemize}
-    \item Now we can define what it means for a given interpretation ``satisfy'' a \texttt{term} and what it means to be ``unsatisfiable'':
+    \item Now we can define what it means for a term to be \textit{satisfied} by a given interpretation:
   \end{itemize}
   \vfill
   \begin{minted}{lean}
   def satisfies (I : Interpretation) (t : term) : Prop :=
     evalTerm I t = True
-
-  def unsatisfiable (t : term) : Prop :=
-    ∀ (I : Interpretation), Not (satisfies I t)
   \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Certified Transformations}
+  \vfill
   \begin{itemize}
-    \item We can give meaning to the rules in terms of Lean's logic with the predicate \texttt{impliesIn}:
+    \item The rules we have shown before (resolution, congruence, etc.) can now be represented with the following predicate:
   \end{itemize}
   \vfill
   \begin{minted}{lean}
   def impliesIn (t1 t2 : term) : Prop :=
     ∀ (I : Interpretation),
       satisfies I t1 -> satisfies I t2
-
-  theorem notImplies1 : ∀ {t1 t2 : term},
-      impliesIn (not (implies t1 t2)) t1
   \end{minted}
 \end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Certified Transformations}
+  \begin{itemize}
+    \item For instance, the rule \textit{notImplies1}, which states that $\neg (t_{1} \rightarrow t_{2}) \rightarrow t_{1}$, can be encoded in the following way:
+  \end{itemize}
+  \vfill
+  \begin{minted}{lean}
+  theorem notImplies1 : ∀ {t1 t2 : term},
+    impliesIn (not (implies t1 t2)) t1
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Certified Transformations}
+  \begin{minted}{lean}
+  theorem cvc5_th0 : impliesIn notModusPonens bot :=
+    fun lean_a0 =>
+      have lean_s0 := notImplies2 lean_a0
+      have lean_s1 := notImplies1 lean_s0
+      have lean_s2 := impliesElim lean_s1
+      have lean_s4 := notImplies1 lean_a0
+      have lean_s6 := R1 (conjunction lean_s2 lean_s4)
+      have lean_s9 := notImplies2 lean_s0
+      contradiction (conjunction lean_s9 lean_s6)
+  \end{minted}
+\end{frame}
+
 
 \begin{frame}
   \frametitle{Certified Transformations}
   \begin{itemize}
-    \item The theorem we proved before can now be rephrased as:\\ \texttt{impliesIn notModusPonens bot}
-    \vitem Since \texttt{evalTerm I bot} is \texttt{False} for any interpretation \texttt{I}, we can use this to derive:\\ \mintinline{lean}{∀ (I : Interpretation), evalTerm I notModusPonens = False}
-    \vitem Finally, this can be used to prove the corresponding theorem stated in Lean's native terms:\\
-    \mintinline{lean}{∀ (P Q : Prop), P -> (P -> Q) -> Q}
+    \item Since \texttt{evalTerm I bot} is \texttt{False} for any interpretation \texttt{I}, we can use this to derive:\\ \mintinline{lean}{∀ (I : Interpretation), evalTerm I notModusPonens = False}
+    \vitem We can use the theorem above to derive a proof for a theorem \textbf{expressed in Lean's native terms}
   \end{itemize}
+  \vfill
+  \centering
+    \mintinline{lean}{∀ (P Q : Prop), P -> (P -> Q) -> Q}
 \end{frame}
 
 \begin{frame}
@@ -1347,6 +1360,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   def Interpretation := Nat → @Sigma sort evalSort
   \end{minted}
 \end{frame}
+
 \begin{frame}[fragile]
   \frametitle{Certified Transformations}
   \begin{minted}{lean}
@@ -1379,29 +1393,32 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
   \end{itemize}
 \end{frame}
 
-\section{Certifying Transformations}
+\section{Reconstructing Proofs with Certifying Transformations}
 
 \begin{frame}
   \frametitle{Certifying Transformations}
   \begin{itemize}
     \item The certifying transformations approach is a well known alternative for these problems
-    \vitem The idea is to map the rules into functions that will generate proofs on the fly. The correctness of these proofs will have to be checked every time one of these functions is used
-    \vitem In our case, we will map the rules into tactics. However, we still map simpler rules to theorems
-    \vitem We no longer need the \texttt{term} type, as tactics are allowed to inspect the abstract syntax tree of any expression, granting them flexibility
+    \vitem The idea is to map the rules into functions that will generate proofs for transformations of terms on the fly
+    \vitem The correctness of these proofs will have to be checked every time we use the hammer, as opposed to just once and for all
+    \vitem Despite that, our proofs will no longer rely on normalization of terms, so they can potentially be faster
+    \vitem Also, it is easier to implement a tactic for a rule than to prove it, as the tactic only cares about a specific case for the rule, while the theorem must consider the most general case
   \end{itemize}
 \end{frame}
-
 \begin{frame}
   \frametitle{Certifying Transformations}
   \begin{itemize}
-    \item We have implemented tactics and theorems to cover all rules for the Boolean, EUF, LRA and LIA fragments
+    \item In our case, we will map the rules into tactics. However, we still map rules that are sufficiently simple to theorems
+    \vitem We no longer need the \texttt{term} type, as tactics are allowed to inspect the abstract syntax tree of any expression, granting them flexibility
+    \vitem We have implemented a library consisting of 75 tactics and theorems that cover all the rules used by cvc5 to reason about formulas involving Booleans, Linear Arithmetic and Equality and Uninterpreted Functions
   \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Certifying Transformations}
   \begin{minted}{lean}
-  theorem cvc5_th0 {P Q : Prop} : (Not (P → ((P → Q) → Q))) → False :=
+  theorem cvc5_th0 (P Q : Prop) :
+      (Not (P → ((P → Q) → Q))) → False :=
     fun lean_a0 : (Not (P → ((P → Q) → Q))) => by
       have lean_s0 : (Not ((P → Q) → Q)) := notImplies2 lean_a0
       have lean_s1 : (P → Q)             := notImplies1 lean_s0
@@ -1478,9 +1495,55 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 % \end{frame}
 
 
+
 \section{Demo: Proof Checking}
 
-\section{Demo: Lean-SMT}
+\begin{frame}[fragile]
+  \frametitle{Lean-SMT}
+  \begin{minted}[fontsize=\footnotesize]{lean}
+  import Smt
+
+  variable {G : Type} [Nonempty G] (op : G -> G -> G) (inv : G -> G) (e : G)
+
+  axiom assoc : ∀ a b c, op a (op b c) = op (op a b) c
+  axiom inverse : ∀ a, op (inv a) a = e
+  axiom ident : ∀ a, op e a = a
+
+  theorem inverse' : ∀ a, op a (inv a) = e := by
+    smt [assoc op, inverse op inv e, ident op e]
+
+  theorem identity' : ∀ a, op a e = a := by
+    smt [assoc op, inverse op inv e, ident op e, inverse' op inv e]
+
+  theorem unique_identity : ∀ e', (∀ z, op e' z = z) -> e' = e := by
+    smt [assoc op, inverse op inv e, ident op e]
+
+  -- Credits also to Abdalrhman Mohammed, Cesare Tinelli and Wojciech Nawrocki
+  \end{minted}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Evaluation}
+  \begin{itemize}
+    \item We used a test set of 6102 SMT problems provided by SMT-LIB, containing only problems expressed in the theories we support
+    \vitem After producing Lean scripts for these problems with cvc5, we filtered out proofs whose size was bigger than 1mb, resulting in 877 proofs
+    \vitem We ran our checker on these 877 proofs. Lean accepted 281 of these proofs
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Evaluation}
+  \begin{itemize}
+    \item 302 failed for exceeding Lean's resources
+    \vitem 106 failed for cvc5 misinterpreting some Lean operator
+    \vitem 11 failed for a bug in an implementation of a tactic (which was fixed)
+    \vitem 182 failed for unknown causes
+  \end{itemize}
+\end{frame}
+
+\section{Thank you! Questions?}
+
+% \section{Demo: Lean-SMT}
 
 % \maketitle
 
