@@ -1205,7 +1205,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Proof Certificates in Lean}
+  \frametitle{Certified Transformations}
   \begin{itemize}
     \item Using it as input to cvc5, we obtain the following proof:
   \end{itemize}
@@ -1221,7 +1221,7 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Proof Certificates in Lean}
+  \frametitle{Certified Transformations}
   \begin{itemize}
     \item We will use the type below to represent formulas
   \end{itemize}
@@ -1327,15 +1327,21 @@ maxalphanames= 4, maxcitenames = 3, minalphanames = 3, minnames = 3]{biblatex}
 \end{frame}
 
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Certified Transformations}
   \begin{itemize}
     \item Since \texttt{evalTerm I bot} is \texttt{False} for any interpretation \texttt{I}, we can use this to derive:\\ \mintinline{lean}{∀ (I : Interpretation), evalTerm I notModusPonens = False}
-    \vitem We can use the theorem above to derive a proof for a theorem \textbf{expressed in Lean's native terms}
+    \vitem This result can be used to derive:\\
+    \begin{minted}{lean}
+    ∀ (I : Interpretation),
+      evalTerm I (implies p (implies (implies p q) q)) = True
+    \end{minted}
+    \vitem Finally, by instantiating the interpretation in a smart way we can prove a theorem \textbf{expressed in Lean's native terms:}
   \end{itemize}
   \vfill
-  \centering
-    \mintinline{lean}{∀ (P Q : Prop), P -> (P -> Q) -> Q}
+    \begin{minted}{lean}
+      ∀ (P Q : Prop), P -> (P -> Q) -> Q
+    \end{minted}
 \end{frame}
 
 \begin{frame}
